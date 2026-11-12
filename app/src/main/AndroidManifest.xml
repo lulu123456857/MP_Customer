@@ -21,6 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 레시피 상세 화면 -->
+        <activity android:name=".DetailActivity" />
     </application>
 
 </manifest>

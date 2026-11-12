@@ -1,5 +1,6 @@
 package com.example.mp_customer
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.ImageView
@@ -191,12 +192,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 카드 클릭: 상세 화면 이동은 Intent 배우면 연결
+                // 카드 클릭: 상세 화면으로 이동 (몇 번째 레시피인지 같이 보냄)
         card1.setOnClickListener {
-            Toast.makeText(applicationContext, "고소한 마늘 참깨 소스 상세 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            intent.putExtra("index", 0)
+            startActivity(intent)
         }
         card2.setOnClickListener {
-            Toast.makeText(applicationContext, "흑당펄 듬뿍 밀크티 상세 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            intent.putExtra("index", 1)
+            startActivity(intent)
         }
 
         // 하단 메뉴: 화면 전환은 Fragment 배우면 연결
