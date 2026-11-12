@@ -172,27 +172,29 @@ class MainActivity : AppCompatActivity() {
             txtLike2.text = likeCount2.toString()
         }
 
-        // 저장: 누르면 북마크가 채워짐
+                // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
         imgSave1.setOnClickListener {
-            saved1 = !saved1
-            if (saved1) {
+            if (savedRecipes.contains(recipeList[0])) {
+                savedRecipes.remove(recipeList[0])
+                imgSave1.setImageResource(R.drawable.ic_bookmark_border)
+            } else {
+                savedRecipes.add(recipeList[0])
                 imgSave1.setImageResource(R.drawable.ic_bookmark)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
-            } else {
-                imgSave1.setImageResource(R.drawable.ic_bookmark_border)
             }
         }
         imgSave2.setOnClickListener {
-            saved2 = !saved2
-            if (saved2) {
+            if (savedRecipes.contains(recipeList[1])) {
+                savedRecipes.remove(recipeList[1])
+                imgSave2.setImageResource(R.drawable.ic_bookmark_border)
+            } else {
+                savedRecipes.add(recipeList[1])
                 imgSave2.setImageResource(R.drawable.ic_bookmark)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
-            } else {
-                imgSave2.setImageResource(R.drawable.ic_bookmark_border)
             }
         }
 
-                // 카드 클릭: 상세 화면으로 이동 (몇 번째 레시피인지 같이 보냄)
+        // 카드 클릭: 상세 화면으로 이동 (몇 번째 레시피인지 같이 보냄)
         card1.setOnClickListener {
             val intent = Intent(applicationContext, DetailActivity::class.java)
             intent.putExtra("index", 0)
@@ -213,13 +215,29 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         navSave.setOnClickListener {
-            Toast.makeText(applicationContext, "저장 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, SavedActivity::class.java)
+            startActivity(intent)
         }
         navMy.setOnClickListener {
             Toast.makeText(applicationContext, "마이페이지 (준비 중)", Toast.LENGTH_SHORT).show()
         }
     }
 
+    // 홈 화면이 다시 보일 때마다 북마크 모양을 보관함 상태에 맞추기 (10장 생명주기)
+    override fun onResume() {
+        super.onResume()
+        if (savedRecipes.contains(recipeList[0])) {
+            imgSave1.setImageResource(R.drawable.ic_bookmark)
+        } else {
+            imgSave1.setImageResource(R.drawable.ic_bookmark_border)
+        }
+        if (savedRecipes.contains(recipeList[1])) {
+            imgSave2.setImageResource(R.drawable.ic_bookmark)
+        } else {
+            imgSave2.setImageResource(R.drawable.ic_bookmark_border)
+        }
+    }
+    
     // 칩(필터 버튼)의 선택/해제 모양을 바꿔주는 함수
     fun setChipSelected(chip : TextView, selected : Boolean) {
         if (selected) {

@@ -87,6 +87,12 @@ class DetailActivity : AppCompatActivity() {
             recipe = recipeList[index]      // 기본 레시피 (RecipeData.kt)
         }
 
+        // 이미 저장한 레시피면 북마크를 채워서 보여주기
+        saved = savedRecipes.contains(recipe)
+        if (saved) {
+            imgSave.setImageResource(R.drawable.ic_bookmark)
+        }
+
         // 화면에 레시피 내용 채우기
         txtName.text = recipe.name
         txtBrand.text = recipe.brand
@@ -139,12 +145,15 @@ class DetailActivity : AppCompatActivity() {
         }
 
         // 저장
+        // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
         btnSave.setOnClickListener {
             saved = !saved
             if (saved) {
+                savedRecipes.add(recipe)
                 imgSave.setImageResource(R.drawable.ic_bookmark)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
             } else {
+                savedRecipes.remove(recipe)
                 imgSave.setImageResource(R.drawable.ic_bookmark_border)
             }
         }
