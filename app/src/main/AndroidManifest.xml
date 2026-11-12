@@ -24,6 +24,8 @@
 
         <!-- 레시피 상세 화면 -->
         <activity android:name=".DetailActivity" />
+        <activity android:name=".DetailActivity" />
+        <activity android:name=".RegisterActivity" />
     </application>
 
 </manifest>

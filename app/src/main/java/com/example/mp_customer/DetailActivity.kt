@@ -80,7 +80,12 @@ class DetailActivity : AppCompatActivity() {
 
         // ===== 3. 홈 화면이 보낸 인텐트에서 레시피 번호 꺼내기 (10장 명시적 인텐트) =====
         val index = intent.getIntExtra("index", 0)
-        recipe = recipeList[index]
+        val isUser = intent.getBooleanExtra("isUser", false)   // 사용자가 등록한 레시피인지
+        if (isUser) {
+            recipe = userRecipes[index]     // 등록 화면에서 만든 레시피
+        } else {
+            recipe = recipeList[index]      // 기본 레시피 (RecipeData.kt)
+        }
 
         // 화면에 레시피 내용 채우기
         txtName.text = recipe.name

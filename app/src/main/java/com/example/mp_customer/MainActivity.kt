@@ -209,7 +209,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "검색 화면 (준비 중)", Toast.LENGTH_SHORT).show()
         }
         navAdd.setOnClickListener {
-            Toast.makeText(applicationContext, "등록 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, RegisterActivity::class.java)
+            startActivity(intent)
         }
         navSave.setOnClickListener {
             Toast.makeText(applicationContext, "저장 화면 (준비 중)", Toast.LENGTH_SHORT).show()
