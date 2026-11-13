@@ -2,6 +2,7 @@
 <!-- 홈 화면: 전체를 세로 리니어레이아웃으로 만들고
      [위: 스크롤되는 내용] + [아래: 고정된 하단 메뉴] 로 나눔 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -44,7 +45,7 @@
                     android:layout_width="26dp"
                     android:layout_height="26dp"
                     android:src="@drawable/ic_notifications_none"
-                    android:tint="#222222" />
+                    app:tint="#222222" />
             </LinearLayout>
 
             <!-- ===== 랜덤 추천 배너 ===== -->
@@ -94,7 +95,7 @@
                         android:layout_height="18dp"
                         android:layout_marginStart="6dp"
                         android:src="@drawable/ic_shuffle"
-                        android:tint="#7A5200" />
+                        app:tint="#7A5200" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -361,7 +362,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_favorite_border"
-                            android:tint="#555555" />
+                            app:tint="#555555" />
 
                         <TextView
                             android:id="@+id/txtLike1"
@@ -383,7 +384,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_bookmark_border"
-                            android:tint="#555555" />
+                            app:tint="#555555" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -451,7 +452,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_favorite_border"
-                            android:tint="#555555" />
+                            app:tint="#555555" />
 
                         <TextView
                             android:id="@+id/txtLike2"
@@ -473,7 +474,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_bookmark_border"
-                            android:tint="#555555" />
+                            app:tint="#555555" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -492,7 +493,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/ic_auto_awesome"
-                    android:tint="#7A5200" />
+                    app:tint="#7A5200" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -533,7 +534,7 @@
                 android:padding="4dp"
                 android:background="@drawable/bg_nav_selected"
                 android:src="@drawable/ic_home"
-                android:tint="#222222" />
+                app:tint="#222222" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -558,7 +559,7 @@
                 android:layout_height="32dp"
                 android:padding="4dp"
                 android:src="@drawable/ic_search"
-                android:tint="#666666" />
+                app:tint="#666666" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -583,7 +584,7 @@
                 android:padding="4dp"
                 android:background="@drawable/bg_nav_add"
                 android:src="@drawable/ic_add"
-                android:tint="#666666" />
+                app:tint="#666666" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -607,7 +608,7 @@
                 android:layout_height="32dp"
                 android:padding="4dp"
                 android:src="@drawable/ic_bookmark_border"
-                android:tint="#666666" />
+                app:tint="#666666" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -631,7 +632,7 @@
                 android:layout_height="32dp"
                 android:padding="4dp"
                 android:src="@drawable/ic_person_outline"
-                android:tint="#666666" />
+                app:tint="#666666" />
 
             <TextView
                 android:layout_width="wrap_content"

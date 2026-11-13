@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
             txtLike2.text = likeCount2.toString()
         }
 
-                // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
+        // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
         imgSave1.setOnClickListener {
             if (savedRecipes.contains(recipeList[0])) {
                 savedRecipes.remove(recipeList[0])
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 하단 메뉴: 화면 전환은 Fragment 배우면 연결
+        // 하단 메뉴: 화면 전환 연결
         navSearch.setOnClickListener {
             Toast.makeText(applicationContext, "검색 화면 (준비 중)", Toast.LENGTH_SHORT).show()
         }
@@ -218,12 +218,25 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, SavedActivity::class.java)
             startActivity(intent)
         }
+
+        // [마이페이지 / 로그인 화면 분기 처리]
         navMy.setOnClickListener {
-            Toast.makeText(applicationContext, "마이페이지 (준비 중)", Toast.LENGTH_SHORT).show()
+            val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val isLoggedIn = sharedPreferences.getBoolean("IS_LOGGED_IN", false)
+
+            if (isLoggedIn) {
+                // 로그인된 상태라면 마이페이지(MyPageActivity)로 이동
+                val intent = Intent(this, MyPageActivity::class.java)
+                startActivity(intent)
+            } else {
+                // 로그인되지 않은 상태라면 로그인 화면(LoginActivity)으로 이동
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
-    // 홈 화면이 다시 보일 때마다 북마크 모양을 보관함 상태에 맞추기 (10장 생명주기)
+    // 홈 화면이 다시 보일 때마다 북마크 모양을 보관함 상태에 맞추기 (생명주기)
     override fun onResume() {
         super.onResume()
         if (savedRecipes.contains(recipeList[0])) {
@@ -237,7 +250,7 @@ class MainActivity : AppCompatActivity() {
             imgSave2.setImageResource(R.drawable.ic_bookmark_border)
         }
     }
-    
+
     // 칩(필터 버튼)의 선택/해제 모양을 바꿔주는 함수
     fun setChipSelected(chip : TextView, selected : Boolean) {
         if (selected) {

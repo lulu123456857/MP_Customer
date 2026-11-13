@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MP_Customer">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -24,9 +25,13 @@
 
         <!-- 레시피 상세 화면 -->
         <activity android:name=".DetailActivity" />
-        <activity android:name=".DetailActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SavedActivity" />
+
+        <!-- 로그인 / 마이페이지 / 내 프로필 -->
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".MyPageActivity" />
+        <activity android:name=".ProfileActivity" />
     </application>
 
 </manifest>
