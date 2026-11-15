@@ -208,7 +208,8 @@ class MainActivity : AppCompatActivity() {
 
         // 하단 메뉴: 화면 전환 연결
         navSearch.setOnClickListener {
-            Toast.makeText(applicationContext, "검색 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, SearchActivity::class.java)
+            startActivity(intent)
         }
         navAdd.setOnClickListener {
             val intent = Intent(applicationContext, RegisterActivity::class.java)

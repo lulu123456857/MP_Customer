@@ -27,6 +27,7 @@
         <activity android:name=".DetailActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SavedActivity" />
+        <activity android:name=".SearchActivity" />
 
         <!-- 로그인 / 마이페이지 / 내 프로필 -->
         <activity android:name=".LoginActivity" />
