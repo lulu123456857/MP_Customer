@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.edit
 
 class LoginActivity : AppCompatActivity() {
 
@@ -98,11 +99,10 @@ class LoginActivity : AppCompatActivity() {
             Toast.makeText(this, "비밀번호 찾기 화면 (준비 중)", Toast.LENGTH_SHORT).show()
         }
 
-        // 7. 회원가입 버튼
+        // 7. 회원가입 버튼 → 회원가입 화면으로 이동
         btnSignUp.setOnClickListener {
-            Toast.makeText(this, "회원가입 화면으로 이동 (준비 중)", Toast.LENGTH_SHORT).show()
-            // val intent = Intent(this, SignUpActivity::class.java)
-            // startActivity(intent)
+            val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
         }
 
         // 8. 로그인 없이 둘러보기
