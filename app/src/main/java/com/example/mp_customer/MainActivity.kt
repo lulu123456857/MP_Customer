@@ -1,5 +1,6 @@
 package com.example.mp_customer
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.ImageView
@@ -171,46 +172,83 @@ class MainActivity : AppCompatActivity() {
             txtLike2.text = likeCount2.toString()
         }
 
-        // 저장: 누르면 북마크가 채워짐
+        // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
         imgSave1.setOnClickListener {
-            saved1 = !saved1
-            if (saved1) {
+            if (savedRecipes.contains(recipeList[0])) {
+                savedRecipes.remove(recipeList[0])
+                imgSave1.setImageResource(R.drawable.ic_bookmark_border)
+            } else {
+                savedRecipes.add(recipeList[0])
                 imgSave1.setImageResource(R.drawable.ic_bookmark)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
-            } else {
-                imgSave1.setImageResource(R.drawable.ic_bookmark_border)
             }
         }
         imgSave2.setOnClickListener {
-            saved2 = !saved2
-            if (saved2) {
+            if (savedRecipes.contains(recipeList[1])) {
+                savedRecipes.remove(recipeList[1])
+                imgSave2.setImageResource(R.drawable.ic_bookmark_border)
+            } else {
+                savedRecipes.add(recipeList[1])
                 imgSave2.setImageResource(R.drawable.ic_bookmark)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
-            } else {
-                imgSave2.setImageResource(R.drawable.ic_bookmark_border)
             }
         }
 
-        // 카드 클릭: 상세 화면 이동은 Intent 배우면 연결
+        // 카드 클릭: 상세 화면으로 이동 (몇 번째 레시피인지 같이 보냄)
         card1.setOnClickListener {
-            Toast.makeText(applicationContext, "고소한 마늘 참깨 소스 상세 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            intent.putExtra("index", 0)
+            startActivity(intent)
         }
         card2.setOnClickListener {
-            Toast.makeText(applicationContext, "흑당펄 듬뿍 밀크티 상세 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            intent.putExtra("index", 1)
+            startActivity(intent)
         }
 
-        // 하단 메뉴: 화면 전환은 Fragment 배우면 연결
+        // 하단 메뉴: 화면 전환 연결
         navSearch.setOnClickListener {
-            Toast.makeText(applicationContext, "검색 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, SearchActivity::class.java)
+            startActivity(intent)
         }
         navAdd.setOnClickListener {
-            Toast.makeText(applicationContext, "등록 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, RegisterActivity::class.java)
+            startActivity(intent)
         }
         navSave.setOnClickListener {
-            Toast.makeText(applicationContext, "저장 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val intent = Intent(applicationContext, SavedActivity::class.java)
+            startActivity(intent)
         }
+
+        // [마이페이지 / 로그인 화면 분기 처리]
         navMy.setOnClickListener {
-            Toast.makeText(applicationContext, "마이페이지 (준비 중)", Toast.LENGTH_SHORT).show()
+            val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val isLoggedIn = sharedPreferences.getBoolean("IS_LOGGED_IN", false)
+
+            if (isLoggedIn) {
+                // 로그인된 상태라면 마이페이지(MyPageActivity)로 이동
+                val intent = Intent(this, MyPageActivity::class.java)
+                startActivity(intent)
+            } else {
+                // 로그인되지 않은 상태라면 로그인 화면(LoginActivity)으로 이동
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+    }
+
+    // 홈 화면이 다시 보일 때마다 북마크 모양을 보관함 상태에 맞추기 (생명주기)
+    override fun onResume() {
+        super.onResume()
+        if (savedRecipes.contains(recipeList[0])) {
+            imgSave1.setImageResource(R.drawable.ic_bookmark)
+        } else {
+            imgSave1.setImageResource(R.drawable.ic_bookmark_border)
+        }
+        if (savedRecipes.contains(recipeList[1])) {
+            imgSave2.setImageResource(R.drawable.ic_bookmark)
+        } else {
+            imgSave2.setImageResource(R.drawable.ic_bookmark_border)
         }
     }
 

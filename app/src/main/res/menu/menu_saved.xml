@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 보관함 ⋮ 버튼 컨텍스트 메뉴 (7장 메뉴) -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/itemClearAll"
+        android:title="전체 삭제" />
+</menu>

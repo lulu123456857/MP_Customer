@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mp_customer"
+        applicationId = "com.sswu.customer"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
