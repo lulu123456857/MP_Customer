@@ -11,9 +11,9 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.content.edit
 
 class LoginActivity : AppCompatActivity() {
 
@@ -53,13 +53,13 @@ class LoginActivity : AppCompatActivity() {
             if (isPasswordVisible) {
                 // 비밀번호 보이게
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                btnTogglePassword.setImageResource(android.R.drawable.ic_menu_close_clear_cancel) // 원하시는 아이콘으로 변경 가능
+                btnTogglePassword.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             } else {
                 // 비밀번호 숨기기 (* 처리)
                 etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 btnTogglePassword.setImageResource(android.R.drawable.ic_menu_view)
             }
-            // 커서가 풀리는 것 방지하기 위해 커서를 맨 뒤로 이동
+            // 커서를 맨 뒤로 이동
             etPassword.setSelection(etPassword.text.length)
         }
 
@@ -76,10 +76,18 @@ class LoginActivity : AppCompatActivity() {
 
             // 로그인 성공 상태 저장 (SharedPreferences 활용)
             val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            editor.putBoolean("IS_LOGGED_IN", true)
-            editor.putString("USER_EMAIL", email)
-            editor.apply()
+
+            // 회원가입 때 저장해 둔 닉네임 (없으면 null)
+            val savedNickname = sharedPreferences.getString("NICKNAME_$email", null)
+
+            sharedPreferences.edit {
+                putBoolean("IS_LOGGED_IN", true)
+                putString("USER_EMAIL", email)
+                // 가입한 닉네임이 있으면 마이페이지에서 쓰는 NICKNAME에 반영
+                if (savedNickname != null) {
+                    putString("NICKNAME", savedNickname)
+                }
+            }
 
             Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
 
