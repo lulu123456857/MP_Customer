@@ -24,6 +24,7 @@
                 android:id="@+id/btnBack"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:contentDescription="뒤로 가기"
                 android:src="@android:drawable/ic_menu_revert"
                 app:tint="#000000" />
 
@@ -99,6 +100,17 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_edit_text">
 
+            <ImageView
+                android:id="@+id/btnToggleSignUpPassword"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="비밀번호 보기 토글"
+                android:src="@android:drawable/ic_menu_view"
+                app:tint="#9E9E9E" />
+
             <EditText
                 android:id="@+id/etSignUpPassword"
                 android:layout_width="match_parent"
@@ -111,16 +123,6 @@
                 android:textColor="#000000"
                 android:textColorHint="#BDBDBD"
                 android:textSize="14sp" />
-
-            <ImageView
-                android:id="@+id/btnToggleSignUpPassword"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="16dp"
-                android:src="@android:drawable/ic_menu_view"
-                app:tint="#9E9E9E" />
         </RelativeLayout>
 
         <!-- 비밀번호 확인 -->
@@ -139,6 +141,17 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_edit_text">
 
+            <ImageView
+                android:id="@+id/btnToggleSignUpPasswordConfirm"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="비밀번호 확인 보기 토글"
+                android:src="@android:drawable/ic_menu_view"
+                app:tint="#9E9E9E" />
+
             <EditText
                 android:id="@+id/etSignUpPasswordConfirm"
                 android:layout_width="match_parent"
@@ -151,16 +164,6 @@
                 android:textColor="#000000"
                 android:textColorHint="#BDBDBD"
                 android:textSize="14sp" />
-
-            <ImageView
-                android:id="@+id/btnToggleSignUpPasswordConfirm"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="16dp"
-                android:src="@android:drawable/ic_menu_view"
-                app:tint="#9E9E9E" />
         </RelativeLayout>
 
         <!-- 가입 버튼 -->
