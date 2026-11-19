@@ -1,4 +1,4 @@
-package com.example.mp_customer
+package com.sswu.mp_customer
 
 import org.junit.Test
 

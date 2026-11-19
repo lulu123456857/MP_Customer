@@ -1,4 +1,4 @@
-package com.example.mp_customer
+package com.sswu.mp_customer
 
 import android.os.Bundle
 import android.text.InputType

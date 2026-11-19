@@ -1,4 +1,4 @@
-package com.example.mp_customer
+package com.sswu.mp_customer
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

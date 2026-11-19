@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mp_customer"
+    namespace = "com.sswu.mp_customer"
     compileSdk {
         version = release(37)
     }

@@ -1,4 +1,4 @@
-package com.example.mp_customer
+package com.sswu.mp_customer
 
 // 레시피 한 개를 담는 클래스 (3장 클래스와 인스턴스)
 class Recipe(
