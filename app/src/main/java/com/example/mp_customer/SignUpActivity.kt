@@ -7,12 +7,24 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignUpActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+
+        // Firebase Auth 및 Firestore 인스턴스 초기화
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val etEmail = findViewById<EditText>(R.id.etSignUpEmail)
@@ -44,21 +56,61 @@ class SignUpActivity : AppCompatActivity() {
                 Toast.makeText(this, "모든 항목을 입력해주세요.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (password.length < 6) {
+                Toast.makeText(this, "비밀번호는 6자 이상 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             if (password != passwordConfirm) {
                 Toast.makeText(this, "비밀번호가 일치하지 않아요.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 이메일별로 닉네임 저장 (로그인할 때 불러와서 마이페이지에 반영)
-            getSharedPreferences("AppPrefs", MODE_PRIVATE)
-                .edit()
-                .putString("NICKNAME_$email", nickname)
-                .apply()
+            // 중복 클릭 방지
+            btnSignUpSubmit.isEnabled = false
 
-            Toast.makeText(this, "회원가입이 완료되었어요! 로그인해주세요.", Toast.LENGTH_SHORT).show()
+            // 1. Firebase Authentication에 이메일/비밀번호로 회원 생성
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val uid = auth.currentUser?.uid ?: ""
 
-            // 가입 화면을 닫으면 로그인 화면이 다시 보여요
-            finish()
+                        // 2. Firestore 'users' 컬렉션에 사용자 추가 정보(닉네임, 이메일) 저장
+                        val userMap = hashMapOf(
+                            "uid" to uid,
+                            "email" to email,
+                            "nickname" to nickname,
+                            "createdAt" to FieldValue.serverTimestamp()
+                        )
+
+                        db.collection("users").document(uid)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                // 기존 팀원 코드(마이페이지 호환용)도 함께 유지
+                                getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                                    .edit()
+                                    .putString("NICKNAME_$email", nickname)
+                                    .apply()
+
+                                // 가입 직후 자동 로그인 상태가 되므로, 로그인 화면에서 다시 로그인하게 하려면 로그아웃 처리
+                                auth.signOut()
+
+                                Toast.makeText(this, "회원가입이 완료되었어요! 로그인해주세요.", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                btnSignUpSubmit.isEnabled = true
+                                Toast.makeText(this, "회원 정보 저장 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        btnSignUpSubmit.isEnabled = true
+                        val errorMsg = when (task.exception) {
+                            is FirebaseAuthUserCollisionException -> "이미 가입된 이메일입니다."
+                            is FirebaseAuthWeakPasswordException -> "비밀번호가 너무 취약합니다 (6자 이상)."
+                            else -> "회원가입 실패: ${task.exception?.localizedMessage}"
+                        }
+                        Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
     }
 
