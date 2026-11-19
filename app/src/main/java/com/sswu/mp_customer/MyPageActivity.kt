@@ -77,7 +77,6 @@ class MyPageActivity : AppCompatActivity() {
 
         // 2. 설정 아이콘 클릭 → 아래에 '로그아웃' 칸 표시
         btnSetting.setOnClickListener {
-            Toast.makeText(this, "설정 눌림", Toast.LENGTH_SHORT).show()   // 확인용 (나중에 지워도 됨)
             val popup = PopupMenu(this, btnSetting)
             popup.menu.add("로그아웃")
             popup.setOnMenuItemClickListener {
