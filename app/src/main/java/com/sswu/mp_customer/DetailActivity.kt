@@ -17,7 +17,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+
+// 좋아요 누른 레시피 목록 (마이페이지 '좋아요한 조합'에서 사용)
+val likedRecipes = ArrayList<Recipe>()
+
 class DetailActivity : AppCompatActivity() {
+    class DetailActivity : AppCompatActivity() {
+    }
     // ===== 1. 위젯 변수 선언 =====
     lateinit var imgBack : ImageView
     lateinit var imgMore : ImageView
@@ -93,6 +99,12 @@ class DetailActivity : AppCompatActivity() {
             imgSave.setImageResource(R.drawable.ic_bookmark)
         }
 
+        // 이미 좋아요한 레시피면 하트를 채워서 보여주기
+        liked = likedRecipes.contains(recipe)
+        if (liked) {
+            imgLike.setImageResource(R.drawable.ic_favorite)
+        }
+
         // 화면에 레시피 내용 채우기
         setRecipeImage(findViewById(R.id.imgRecipe), recipe)
         txtName.text = recipe.name
@@ -132,13 +144,15 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        // 좋아요
+        // 좋아요: 좋아요 목록(likedRecipes)에 넣거나 빼기
         btnLike.setOnClickListener {
             if (liked) {
                 recipe.likes = recipe.likes - 1
+                likedRecipes.remove(recipe)
                 imgLike.setImageResource(R.drawable.ic_favorite_border)
             } else {
                 recipe.likes = recipe.likes + 1
+                likedRecipes.add(recipe)
                 imgLike.setImageResource(R.drawable.ic_favorite)
             }
             liked = !liked
