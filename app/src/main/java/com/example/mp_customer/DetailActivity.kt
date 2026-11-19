@@ -94,6 +94,7 @@ class DetailActivity : AppCompatActivity() {
         }
 
         // 화면에 레시피 내용 채우기
+        setRecipeImage(findViewById(R.id.imgRecipe), recipe)
         txtName.text = recipe.name
         txtBrand.text = recipe.brand
         txtTastes.text = recipe.tastes

@@ -189,6 +189,7 @@ class SearchActivity : AppCompatActivity() {
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         params.topMargin = dp(12)
         card.layoutParams = params
+        setRecipeImage(card.findViewById(R.id.imgCard), recipe)
 
         card.findViewById<TextView>(R.id.txtCardBrand).text = recipe.brand
         card.findViewById<TextView>(R.id.txtCardName).text = recipe.name
