@@ -206,11 +206,12 @@ class MyPageActivity : AppCompatActivity() {
 
     // [추가] Recipe 목록을 어댑터용 RecipeCard 목록으로 바꾸기
     // id에는 목록 안의 순서(0, 1, 2...)를 넣어서, 카드를 누르면 currentList에서 다시 찾을 수 있게 함
+    // [변경] 마지막에 원본 레시피(r)도 같이 넘겨서 어댑터에서 브랜드별 이미지를 넣을 수 있게 함
     private fun toCards(list: List<Recipe>): List<RecipeCard> {
         val cards = ArrayList<RecipeCard>()
         for (i in list.indices) {
             val r = list[i]
-            cards.add(RecipeCard(i, r.name, r.brand, r.tastes, r.likes, savedRecipes.contains(r)))
+            cards.add(RecipeCard(i, r.name, r.brand, r.tastes, r.likes, savedRecipes.contains(r), r))
         }
         return cards
     }
@@ -234,6 +235,7 @@ class MyPageActivity : AppCompatActivity() {
         FirebaseAuth.getInstance().signOut()
         getSharedPreferences("AppPrefs", MODE_PRIVATE).edit {
             putBoolean("IS_LOGGED_IN", false)
+            putBoolean("KEEP_LOGIN", false)   // [추가] 로그인 유지 해제
             remove("USER_EMAIL")
         }
         // [추가] 이전 사용자의 기록 지우기 (다음 사람이 로그인하면 0부터 시작)

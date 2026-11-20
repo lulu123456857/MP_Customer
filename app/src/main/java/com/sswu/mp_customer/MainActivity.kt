@@ -9,9 +9,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import android.view.View
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
+
+// [추가] 앱을 새로 켰을 때(프로세스 시작 후 첫 실행) 딱 한 번만 로그인 유지 여부를 확인하기 위한 표시
+// 로그인 직후 / 로그아웃 직후 MainActivity가 다시 열려도 이 값은 true로 유지되므로 다시 검사하지 않음
+private var isAppStarted = false
 
 class MainActivity : AppCompatActivity() {
     // ===== 1. 위젯 변수를 전역변수로 선언 (lateinit) =====
@@ -64,6 +70,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // [추가] 로그인 유지: 앱을 새로 켠 첫 실행에서만 확인
+        // - 로그인 유지를 체크하지 않았다면 → 로그인 상태를 풀어서 다시 로그인하게 함
+        // - 체크했지만 Firebase 로그인 정보가 없다면 → 로그인 상태를 풀어서 꼬이지 않게 함
+        if (!isAppStarted) {
+            isAppStarted = true
+            val startPrefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val keepLogin = startPrefs.getBoolean("KEEP_LOGIN", false)
+            val firebaseUser = FirebaseAuth.getInstance().currentUser
+            if (!keepLogin || firebaseUser == null) {
+                FirebaseAuth.getInstance().signOut()
+                startPrefs.edit {
+                    putBoolean("IS_LOGGED_IN", false)
+                    putBoolean("KEEP_LOGIN", false)
+                    remove("USER_EMAIL")
+                }
+            }
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

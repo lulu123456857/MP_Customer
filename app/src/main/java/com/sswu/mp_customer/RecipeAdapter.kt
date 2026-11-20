@@ -14,7 +14,8 @@ data class RecipeCard(
     val brand: String,
     val tastes: String,
     val likes: Int,
-    val saved: Boolean = false   // 저장 여부
+    val saved: Boolean = false,   // 저장 여부
+    val recipe: Recipe? = null    // [추가] 원본 레시피 (홈 화면처럼 이미지를 넣을 때 사용)
 )
 
 class RecipeAdapter(
@@ -39,6 +40,8 @@ class RecipeAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val r = items[position]
+        // [추가] 홈 화면(MainActivity.addCard)과 같은 함수로 이미지 넣기
+        r.recipe?.let { setRecipeImage(holder.imgCard, it) }
         holder.brand.text = r.brand
         holder.name.text = r.name
         holder.tastes.text = r.tastes

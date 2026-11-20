@@ -3,6 +3,7 @@ package com.sswu.mp_customer
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -29,6 +30,17 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // [추가] 로그인 유지: 저장된 값이 true이고 Firebase 세션이 살아있으면 로그인 화면 건너뛰고 바로 홈으로
+        val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        if (prefs.getBoolean("KEEP_LOGIN", false) &&
+            FirebaseAuth.getInstance().currentUser != null
+        ) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_login)
 
@@ -49,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnTogglePassword = findViewById<ImageView>(R.id.btnTogglePassword)
         val btnLogin = findViewById<AppCompatButton>(R.id.btnLogin)
-        val btnGoogleLogin = findViewById<AppCompatButton>(R.id.btnGoogleLogin)
+        val cbKeepLogin = findViewById<CheckBox>(R.id.cbKeepLogin) // [추가] 로그인 유지 체크박스
         val btnSignUp = findViewById<TextView>(R.id.btnSignUp)
         val btnGuest = findViewById<TextView>(R.id.btnGuest)
         val btnFindPassword = findViewById<TextView>(R.id.btnFindPassword)
@@ -100,12 +112,12 @@ class LoginActivity : AppCompatActivity() {
                         db.collection("users").document(uid).get()
                             .addOnSuccessListener { document ->
                                 val firestoreNickname = document.getString("nickname")
-                                // [변경] 조회한 닉네임을 로컬 저장소에 반영하고 메인 화면으로 이동
-                                completeLoginAndMove(email, firestoreNickname)
+                                // [변경] 조회한 닉네임을 로컬 저장소에 반영하고 메인 화면으로 이동 (로그인 유지 체크 여부 함께 전달)
+                                completeLoginAndMove(email, firestoreNickname, cbKeepLogin.isChecked)
                             }
                             .addOnFailureListener {
                                 // [추가] DB 조회에 일시 실패하더라도 로그인 자체는 정상 완료 처리
-                                completeLoginAndMove(email, null)
+                                completeLoginAndMove(email, null, cbKeepLogin.isChecked)
                             }
                     } else {
                         // [추가] 로그인 실패 시 버튼 다시 활성화 및 원인별 안내 메시지 출력
@@ -120,23 +132,18 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // 5. 구글 로그인 버튼
-        btnGoogleLogin.setOnClickListener {
-            Toast.makeText(this, "구글 로그인 기능은 준비 중이에요.", Toast.LENGTH_SHORT).show()
-        }
-
-        // 6. 비밀번호 찾기
+        // 5. 비밀번호 찾기
         btnFindPassword.setOnClickListener {
             Toast.makeText(this, "비밀번호 찾기 화면 (준비 중)", Toast.LENGTH_SHORT).show()
         }
 
-        // 7. 회원가입 버튼 → 회원가입 화면으로 이동
+        // 6. 회원가입 버튼 → 회원가입 화면으로 이동
         btnSignUp.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
 
-        // 8. 로그인 없이 둘러보기
+        // 7. 로그인 없이 둘러보기
         btnGuest.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -146,13 +153,15 @@ class LoginActivity : AppCompatActivity() {
 
     // [추가] 기존 로그인 성공 처리 로직(SharedPreferences 저장 + MainActivity 이동)을 별도 함수로 분리
     // Firestore에서 가져온 닉네임을 우선 적용하고, 없으면 기존 로컬 저장소 닉네임을 유지해 마이페이지와 호환됨
-    private fun completeLoginAndMove(email: String, firestoreNickname: String?) {
+    // [변경] keepLogin: 로그인 유지 체크박스 상태를 SharedPreferences에 저장
+    private fun completeLoginAndMove(email: String, firestoreNickname: String?, keepLogin: Boolean) {
         val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
         val localSavedNickname = sharedPreferences.getString("NICKNAME_$email", null)
         val finalNickname = firestoreNickname ?: localSavedNickname
 
         sharedPreferences.edit {
             putBoolean("IS_LOGGED_IN", true)
+            putBoolean("KEEP_LOGIN", keepLogin) // [추가] 로그인 유지 여부 저장
             putString("USER_EMAIL", email)
             if (finalNickname != null) {
                 putString("NICKNAME", finalNickname)
