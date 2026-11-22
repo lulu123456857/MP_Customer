@@ -14,6 +14,6 @@ fun setRecipeImage(img: ImageView, recipe: Recipe) {
     // 이전에 입힌 배경·색을 지우고 이미지를 꽉 차게 넣기
     img.background = null
     img.clearColorFilter()
-    img.scaleType = ImageView.ScaleType.CENTER_CROP
+    img.scaleType = ImageView.ScaleType.FIT_CENTER
     img.setImageResource(image)
 }

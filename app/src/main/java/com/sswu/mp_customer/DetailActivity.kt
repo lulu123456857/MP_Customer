@@ -44,6 +44,7 @@ class DetailActivity : AppCompatActivity() {
     lateinit var btnSave : LinearLayout
     lateinit var imgSave : ImageView
     lateinit var btnFollow : TextView
+    lateinit var btnBrandSite : TextView
 
     // ===== 상태 변수 =====
     lateinit var recipe : Recipe   // 지금 보여주는 레시피
@@ -83,6 +84,7 @@ class DetailActivity : AppCompatActivity() {
         btnSave = findViewById<LinearLayout>(R.id.btnSave)
         imgSave = findViewById<ImageView>(R.id.imgSave)
         btnFollow = findViewById<TextView>(R.id.btnFollow)
+        btnBrandSite = findViewById<TextView>(R.id.btnBrandSite)
 
         // ===== 3. 홈 화면이 보낸 인텐트에서 레시피 번호 꺼내기 (10장 명시적 인텐트) =====
         val index = intent.getIntExtra("index", 0)
@@ -121,6 +123,13 @@ class DetailActivity : AppCompatActivity() {
         // 뒤로가기: 현재 액티비티 끝내기 → 홈 화면으로 돌아감 (10장)
         imgBack.setOnClickListener {
             finish()
+        }
+
+        // 브랜드 공식 홈페이지 보기: 브랜드 이름을 넘기고 웹 화면 열기
+        btnBrandSite.setOnClickListener {
+            val intent = Intent(applicationContext, WebActivity::class.java)
+            intent.putExtra("brand", recipe.brand)
+            startActivity(intent)
         }
 
         // 더보기(⋮): 컨텍스트 메뉴 열기 (7장)
