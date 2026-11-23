@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:889891571932:android:db073097a422a800590c19",
+        "mobilesdk_app_id": "1:889891571932:android:7823a6ae8df4fb60590c19",
         "android_client_info": {
-          "package_name": "com.example.mp_customer"
+          "package_name": "com.sswu.customer"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:889891571932:android:7823a6ae8df4fb60590c19",
+        "mobilesdk_app_id": "1:889891571932:android:f8c1b3b87a676873590c19",
         "android_client_info": {
-          "package_name": "com.sswu.customer"
+          "package_name": "com.sswu.mp_customer"
         }
       },
       "oauth_client": [],

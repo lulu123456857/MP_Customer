@@ -155,14 +155,18 @@ class MyPageActivity : AppCompatActivity() {
     }
 
     // [추가] 올린 조합 / 받은 좋아요 / 저장한 조합 숫자를 실제 데이터로 계산
+    // [수정] 올린 조합 / 받은 좋아요 / 저장한 조합 숫자를 '현재 로그인한 내 계정(uid)' 기준으로 계산
     private fun updateStats() {
-        // 올린 조합 = 등록 화면에서 내가 등록한 레시피 수
-        tvCountPost.text = userRecipes.size.toString()
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        val myRecipes = userRecipes.filter { it.authorUid == currentUid }
 
-        // 받은 좋아요 = 내가 올린 레시피들의 좋아요 수를 모두 더한 값
+        // 올린 조합 = 현재 계정이 등록한 레시피 수
+        tvCountPost.text = myRecipes.size.toString()
+
+        // 받은 좋아요 = 현재 계정이 올린 레시피들의 좋아요 수를 모두 더한 값
         var totalLikes = 0
-        for (r in userRecipes) {
-            totalLikes = totalLikes + r.likes
+        for (r in myRecipes) {
+            totalLikes += r.likes
         }
         tvCountLike.text = totalLikes.toString()
 
@@ -177,10 +181,13 @@ class MyPageActivity : AppCompatActivity() {
         tabLikedPost.setTextColor(Color.parseColor("#888888"))
         tabLikedPost.paint.isFakeBoldText = false
 
-        // [수정] 가짜 데이터 대신 내가 등록한 레시피 (최근 것부터)
+        // [수정] 전체 userRecipes 중 현재 로그인된 계정의 uid와 일치하는 레시피만 필터링 (최근 것부터)
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        val myRecipes = userRecipes.filter { it.authorUid == currentUid }
+
         currentList = ArrayList()
-        for (i in userRecipes.indices.reversed()) {
-            currentList.add(userRecipes[i])
+        for (i in myRecipes.indices.reversed()) {
+            currentList.add(myRecipes[i])
         }
         tvListHeader.text =
             if (currentList.isEmpty()) "아직 공유한 꿀조합이 없어요" else "내가 공유한 꿀조합 ${currentList.size}개"

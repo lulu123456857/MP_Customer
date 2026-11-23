@@ -15,8 +15,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
-// 사용자가 등록한 레시피를 모아두는 목록 (앱을 끄면 사라짐 → 나중에 Firestore로 바꿀 예정)
 val userRecipes = ArrayList<Recipe>()
 
 class RegisterActivity : AppCompatActivity() {
@@ -43,12 +45,11 @@ class RegisterActivity : AppCompatActivity() {
     // ===== 상태 변수 =====
     val brands = arrayOf("아마스빈", "공차", "하이디라오", "서브웨이", "기타")
     val units = arrayOf("스푼", "샷", "ml", "g", "개", "%")
-    var selectedBrand = ""          // 선택한 브랜드 (처음엔 비어 있음)
-    var selectedUnit = "스푼"        // 선택한 단위 (모든 재료에 똑같이 적용)
-    var baseServing = 1             // 기준 인분
+    var selectedBrand = ""
+    var selectedUnit = "스푼"
+    var baseServing = 1
     val tasteSelected = BooleanArray(5)
 
-    // 재료 입력 줄마다 만든 위젯을 모아두는 목록
     val nameEdits = ArrayList<EditText>()
     val amountEdits = ArrayList<EditText>()
     val unitTexts = ArrayList<TextView>()
@@ -64,37 +65,31 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         // ===== 2. 위젯 대입 =====
-        imgBack = findViewById<ImageView>(R.id.imgBack)
-        imgHelp = findViewById<ImageView>(R.id.imgHelp)
-        boxPhoto = findViewById<LinearLayout>(R.id.boxPhoto)
-        editName = findViewById<EditText>(R.id.editName)
-        boxBrand = findViewById<LinearLayout>(R.id.boxBrand)
-        txtBrand = findViewById<TextView>(R.id.txtBrand)
-        chipSweet = findViewById<TextView>(R.id.chipSweet)
-        chipSour = findViewById<TextView>(R.id.chipSour)
-        chipNutty = findViewById<TextView>(R.id.chipNutty)
-        chipSpicy = findViewById<TextView>(R.id.chipSpicy)
-        chipChoco = findViewById<TextView>(R.id.chipChoco)
-        layoutRows = findViewById<LinearLayout>(R.id.layoutRows)
-        btnAddRow = findViewById<TextView>(R.id.btnAddRow)
-        btnServing1 = findViewById<TextView>(R.id.btnServing1)
-        btnServing2 = findViewById<TextView>(R.id.btnServing2)
-        btnServing3 = findViewById<TextView>(R.id.btnServing3)
-        editTip = findViewById<EditText>(R.id.editTip)
-        btnRegister = findViewById<TextView>(R.id.btnRegister)
+        imgBack = findViewById(R.id.imgBack)
+        imgHelp = findViewById(R.id.imgHelp)
+        boxPhoto = findViewById(R.id.boxPhoto)
+        editName = findViewById(R.id.editName)
+        boxBrand = findViewById(R.id.boxBrand)
+        txtBrand = findViewById(R.id.txtBrand)
+        chipSweet = findViewById(R.id.chipSweet)
+        chipSour = findViewById(R.id.chipSour)
+        chipNutty = findViewById(R.id.chipNutty)
+        chipSpicy = findViewById(R.id.chipSpicy)
+        chipChoco = findViewById(R.id.chipChoco)
+        layoutRows = findViewById(R.id.layoutRows)
+        btnAddRow = findViewById(R.id.btnAddRow)
+        btnServing1 = findViewById(R.id.btnServing1)
+        btnServing2 = findViewById(R.id.btnServing2)
+        btnServing3 = findViewById(R.id.btnServing3)
+        editTip = findViewById(R.id.editTip)
+        btnRegister = findViewById(R.id.btnRegister)
 
-        // 처음에 재료 입력 줄 2개 만들어두기
         addIngredientRow()
         addIngredientRow()
 
         // ===== 3. 클릭 동작 =====
+        imgBack.setOnClickListener { finish() }
 
-        // 뒤로가기
-        imgBack.setOnClickListener {
-            finish()
-        }
-
-        // 도움말: 안내 대화상자 (7장)
         imgHelp.setOnClickListener {
             val dlg = AlertDialog.Builder(this@RegisterActivity)
             dlg.setTitle("꿀조합 등록 방법")
@@ -103,16 +98,14 @@ class RegisterActivity : AppCompatActivity() {
             dlg.show()
         }
 
-        // 사진 추가: 아직 준비 중
         boxPhoto.setOnClickListener {
             Toast.makeText(applicationContext, "사진 추가는 준비 중이에요", Toast.LENGTH_SHORT).show()
         }
 
-        // 브랜드: 목록 대화상자에서 고르기 (7장 목록 대화상자)
         boxBrand.setOnClickListener {
             val dlg = AlertDialog.Builder(this@RegisterActivity)
             dlg.setTitle("브랜드 선택")
-            dlg.setItems(brands) { dialog, which ->
+            dlg.setItems(brands) { _, which ->
                 selectedBrand = brands[which]
                 txtBrand.text = selectedBrand
                 txtBrand.setTextColor(Color.parseColor("#222222"))
@@ -121,7 +114,6 @@ class RegisterActivity : AppCompatActivity() {
             dlg.show()
         }
 
-        // 맛 태그: 누를 때마다 켜짐/꺼짐 (여러 개 선택)
         val tasteChips = arrayOf(chipSweet, chipSour, chipNutty, chipSpicy, chipChoco)
         for (i in tasteChips.indices) {
             tasteChips[i].setOnClickListener {
@@ -130,12 +122,8 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // 재료 추가 버튼: 입력 줄 하나 더 만들기
-        btnAddRow.setOnClickListener {
-            addIngredientRow()
-        }
+        btnAddRow.setOnClickListener { addIngredientRow() }
 
-        // 기준 인분: 하나만 선택
         val servingButtons = arrayOf(btnServing1, btnServing2, btnServing3)
         for (i in servingButtons.indices) {
             servingButtons[i].setOnClickListener {
@@ -147,14 +135,9 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // 등록 버튼
-        btnRegister.setOnClickListener {
-            checkAndRegister()
-        }
+        btnRegister.setOnClickListener { checkAndRegister() }
     }
 
-    // 재료 입력 줄 하나를 Kotlin 코드로 만들어 붙이기 (5장: Kotlin 코드로 화면 만들기)
-    // [재료 이름 입력칸] [양 입력칸] [단위 ▾]
     fun addIngredientRow() {
         val row = LinearLayout(this)
         row.orientation = LinearLayout.HORIZONTAL
@@ -162,7 +145,6 @@ class RegisterActivity : AppCompatActivity() {
         rowParams.topMargin = dp(8)
         row.layoutParams = rowParams
 
-        // 재료 이름
         val editItem = EditText(this)
         editItem.hint = "재료명"
         editItem.textSize = 15f
@@ -171,7 +153,6 @@ class RegisterActivity : AppCompatActivity() {
         editItem.inputType = InputType.TYPE_CLASS_TEXT
         editItem.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
 
-        // 양 (숫자만 입력, 소수점 가능)
         val editAmount = EditText(this)
         editAmount.hint = "양"
         editAmount.textSize = 15f
@@ -182,9 +163,8 @@ class RegisterActivity : AppCompatActivity() {
         amountParams.leftMargin = dp(8)
         editAmount.layoutParams = amountParams
 
-        // 단위 (누르면 목록 대화상자)
         val txtUnit = TextView(this)
-        txtUnit.text = selectedUnit + " ▾"
+        txtUnit.text = "$selectedUnit ▾"
         txtUnit.textSize = 14f
         txtUnit.gravity = Gravity.CENTER
         txtUnit.setTextColor(Color.parseColor("#333333"))
@@ -192,38 +172,33 @@ class RegisterActivity : AppCompatActivity() {
         val unitParams = LinearLayout.LayoutParams(dp(76), LinearLayout.LayoutParams.MATCH_PARENT)
         unitParams.leftMargin = dp(8)
         txtUnit.layoutParams = unitParams
-        txtUnit.setOnClickListener {
-            showUnitDialog()
-        }
+        txtUnit.setOnClickListener { showUnitDialog() }
 
         row.addView(editItem)
         row.addView(editAmount)
         row.addView(txtUnit)
         layoutRows.addView(row)
 
-        // 나중에 입력값을 꺼내 쓰려고 목록에 저장
         nameEdits.add(editItem)
         amountEdits.add(editAmount)
         unitTexts.add(txtUnit)
     }
 
-    // 단위 고르기: 고르면 모든 재료 줄의 단위가 함께 바뀜 (비율 그래프를 위해 통일)
     fun showUnitDialog() {
         val dlg = AlertDialog.Builder(this@RegisterActivity)
         dlg.setTitle("단위 선택")
-        dlg.setItems(units) { dialog, which ->
+        dlg.setItems(units) { _, which ->
             selectedUnit = units[which]
             for (t in unitTexts) {
-                t.text = selectedUnit + " ▾"
+                t.text = "$selectedUnit ▾"
             }
         }
         dlg.setNegativeButton("취소", null)
         dlg.show()
     }
 
-    // 입력값을 검사하고, 괜찮으면 확인 대화상자 띄우기
     fun checkAndRegister() {
-        val name = editName.text.toString()
+        val name = editName.text.toString().trim()
         if (name.isEmpty()) {
             Toast.makeText(applicationContext, "조합 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             return
@@ -233,15 +208,14 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // 재료 모으기: 이름과 양이 둘 다 적힌 줄만 사용
         val ingredientList = ArrayList<String>()
         val amountList = ArrayList<Double>()
         for (i in nameEdits.indices) {
-            val item = nameEdits[i].text.toString()
-            val amount = amountEdits[i].text.toString().toDoubleOrNull()   // 숫자가 아니면 null
+            val item = nameEdits[i].text.toString().trim()
+            val amount = amountEdits[i].text.toString().toDoubleOrNull()
             if (item.isNotEmpty() && amount != null && amount > 0) {
                 ingredientList.add(item)
-                amountList.add(amount / baseServing)    // 1인분 기준 양으로 바꿔서 저장
+                amountList.add(amount / baseServing)
             }
         }
         if (ingredientList.size < 2) {
@@ -249,47 +223,77 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // 선택한 맛 태그를 "고소한 맛 · 매운맛" 형태로 만들기
         val tasteNames = arrayOf("달달한 맛", "상큼한 맛", "고소한 맛", "매운맛", "초코")
         var tastes = ""
         for (i in tasteNames.indices) {
             if (tasteSelected[i]) {
-                if (tastes.isNotEmpty()) tastes = tastes + " · "
-                tastes = tastes + tasteNames[i]
+                if (tastes.isNotEmpty()) tastes += " · "
+                tastes += tasteNames[i]
             }
         }
         if (tastes.isEmpty()) tastes = "맛 태그 없음"
 
-        var tip = editTip.text.toString()
+        var tip = editTip.text.toString().trim()
         if (tip.isEmpty()) tip = "작성된 팁이 없어요."
 
-        // 확인 대화상자 (7장)
+        // [추가] 현재 로그인한 사용자 UID 및 닉네임 가져오기
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val uid = currentUser?.uid ?: ""
+        val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val authorNickname = prefs.getString("NICKNAME", "소스장인") ?: "소스장인"
+
         val dlg = AlertDialog.Builder(this@RegisterActivity)
         dlg.setTitle("꿀조합 등록")
-        dlg.setMessage("'" + name + "'을(를) 등록할까요?")
-        dlg.setPositiveButton("등록") { dialog, which ->
-            // 새 레시피 만들어서 목록에 추가
-            val newRecipe = Recipe(
-                name, selectedBrand, tastes, "나",
-                ingredientList.toTypedArray(),
-                amountList.toDoubleArray(),
-                selectedUnit, tip, 0
-            )
-            userRecipes.add(newRecipe)
-            Toast.makeText(applicationContext, "등록됐어요!", Toast.LENGTH_SHORT).show()
+        dlg.setMessage("'$name'을(를) 등록할까요?")
+        dlg.setPositiveButton("등록") { _, _ ->
+            btnRegister.isEnabled = false
 
-            // 방금 등록한 레시피의 상세 화면으로 이동 (10장 인텐트)
-            val intent = Intent(applicationContext, DetailActivity::class.java)
-            intent.putExtra("index", userRecipes.size - 1)
-            intent.putExtra("isUser", true)
-            startActivity(intent)
-            finish()   // 등록 화면은 닫기
+            // [변경] Firestore 'recipes' 컬렉션에 저장할 데이터 구성
+            val db = FirebaseFirestore.getInstance()
+            val newDocRef = db.collection("recipes").document()
+            val recipeData = hashMapOf(
+                "name" to name,
+                "brand" to selectedBrand,
+                "tastes" to tastes,
+                "author" to authorNickname,
+                "uid" to uid,
+                "ingredients" to ingredientList,
+                "amounts" to amountList,
+                "unit" to selectedUnit,
+                "tip" to tip,
+                "likes" to 0,
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+
+            newDocRef.set(recipeData)
+                .addOnSuccessListener {
+                    // 로컬 userRecipes에도 동일 ID로 즉시 반영 후 상세 화면으로 이동
+                    val newRecipe = Recipe(
+                        name, selectedBrand, tastes, authorNickname,
+                        ingredientList.toTypedArray(),
+                        amountList.toDoubleArray(),
+                        selectedUnit, tip, 0,
+                        id = newDocRef.id,
+                        authorUid = uid
+                    )
+                    userRecipes.add(newRecipe)
+                    Toast.makeText(applicationContext, "등록됐어요!", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(applicationContext, DetailActivity::class.java)
+                    intent.putExtra("index", userRecipes.size - 1)
+                    intent.putExtra("isUser", true)
+                    startActivity(intent)
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    btnRegister.isEnabled = true
+                    Toast.makeText(applicationContext, "등록 실패: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
         }
         dlg.setNegativeButton("취소", null)
         dlg.show()
     }
 
-    // 칩 선택/해제 모양 바꾸기
     fun setChipSelected(chip : TextView, selected : Boolean) {
         if (selected) {
             chip.setBackgroundResource(R.drawable.bg_chip_selected)
@@ -300,7 +304,6 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // dp → 픽셀
     fun dp(value: Int): Int {
         return (value * resources.displayMetrics.density).toInt()
     }
