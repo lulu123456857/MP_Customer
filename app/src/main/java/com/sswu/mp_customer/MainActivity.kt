@@ -3,6 +3,7 @@ package com.sswu.mp_customer
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -11,12 +12,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
-import android.view.View
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 
-// [추가] 앱을 새로 켰을 때(프로세스 시작 후 첫 실행) 딱 한 번만 로그인 유지 여부를 확인하기 위한 표시
-// 로그인 직후 / 로그아웃 직후 MainActivity가 다시 열려도 이 값은 true로 유지되므로 다시 검사하지 않음
 private var isAppStarted = false
 
 class MainActivity : AppCompatActivity() {
@@ -47,12 +45,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var txtHomeEmpty : TextView
 
     // 지금 선택된 필터·정렬 상태
-    var selectedBrand = "전체"          // 선택한 브랜드
-    var sortType = "인기순"              // "인기순" 또는 "최신순"
+    var selectedBrand = "전체"
+    var sortType = "인기순"
     val tasteNames = arrayOf("달달한 맛", "상큼한 맛", "고소한 맛", "매운맛", "초코")
-    val tasteSelected = BooleanArray(5)     // 맛 필터마다 켜져 있는지
+    val tasteSelected = BooleanArray(5)
 
-    // 맛 버튼마다 "같은 뜻으로 볼 단어들"
     val tasteKeywords = arrayOf(
         arrayOf("달달", "달콤"),
         arrayOf("상큼", "새콤", "산뜻"),
@@ -71,9 +68,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // [추가] 로그인 유지: 앱을 새로 켠 첫 실행에서만 확인
-        // - 로그인 유지를 체크하지 않았다면 → 로그인 상태를 풀어서 다시 로그인하게 함
-        // - 체크했지만 Firebase 로그인 정보가 없다면 → 로그인 상태를 풀어서 꼬이지 않게 함
         if (!isAppStarted) {
             isAppStarted = true
             val startPrefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
@@ -98,36 +92,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         // ===== 2. 변수에 위젯 대입 (findViewById) =====
-        imgBell = findViewById<ImageView>(R.id.imgBell)
-        bannerRandom = findViewById<LinearLayout>(R.id.bannerRandom)
+        imgBell = findViewById(R.id.imgBell)
+        bannerRandom = findViewById(R.id.bannerRandom)
 
-        chipAll = findViewById<TextView>(R.id.chipAll)
-        chipAmasvin = findViewById<TextView>(R.id.chipAmasvin)
-        chipGongcha = findViewById<TextView>(R.id.chipGongcha)
-        chipHaidilao = findViewById<TextView>(R.id.chipHaidilao)
-        chipMore = findViewById<TextView>(R.id.chipMore)
+        chipAll = findViewById(R.id.chipAll)
+        chipAmasvin = findViewById(R.id.chipAmasvin)
+        chipGongcha = findViewById(R.id.chipGongcha)
+        chipHaidilao = findViewById(R.id.chipHaidilao)
+        chipMore = findViewById(R.id.chipMore)
 
-        chipSweet = findViewById<TextView>(R.id.chipSweet)
-        chipSour = findViewById<TextView>(R.id.chipSour)
-        chipNutty = findViewById<TextView>(R.id.chipNutty)
-        chipSpicy = findViewById<TextView>(R.id.chipSpicy)
-        chipChoco = findViewById<TextView>(R.id.chipChoco)
+        chipSweet = findViewById(R.id.chipSweet)
+        chipSour = findViewById(R.id.chipSour)
+        chipNutty = findViewById(R.id.chipNutty)
+        chipSpicy = findViewById(R.id.chipSpicy)
+        chipChoco = findViewById(R.id.chipChoco)
 
-        tabPopular = findViewById<TextView>(R.id.tabPopular)
-        tabRecent = findViewById<TextView>(R.id.tabRecent)
+        tabPopular = findViewById(R.id.tabPopular)
+        tabRecent = findViewById(R.id.tabRecent)
 
-        layoutHomeList = findViewById<LinearLayout>(R.id.layoutHomeList)
-        txtHomeEmpty = findViewById<TextView>(R.id.txtHomeEmpty)
+        layoutHomeList = findViewById(R.id.layoutHomeList)
+        txtHomeEmpty = findViewById(R.id.txtHomeEmpty)
 
-        navHome = findViewById<LinearLayout>(R.id.navHome)
-        navSearch = findViewById<LinearLayout>(R.id.navSearch)
-        navAdd = findViewById<LinearLayout>(R.id.navAdd)
-        navSave = findViewById<LinearLayout>(R.id.navSave)
-        navMy = findViewById<LinearLayout>(R.id.navMy)
+        navHome = findViewById(R.id.navHome)
+        navSearch = findViewById(R.id.navSearch)
+        navAdd = findViewById(R.id.navAdd)
+        navSave = findViewById(R.id.navSave)
+        navMy = findViewById(R.id.navMy)
 
-        // ===== 3. 클릭했을 때 동작 (setOnClickListener 람다식) =====
-
-        // 알림, 랜덤 추천: 아직 기능이 없으니 토스트만
+        // ===== 3. 클릭했을 때 동작 =====
         imgBell.setOnClickListener {
             Toast.makeText(applicationContext, "새 알림이 없어요", Toast.LENGTH_SHORT).show()
         }
@@ -135,7 +127,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "랜덤 추천은 준비 중이에요", Toast.LENGTH_SHORT).show()
         }
 
-        // 브랜드 필터: 하나만 선택, 고른 브랜드로 목록 다시 그리기
         val brandChips = arrayOf(chipAll, chipAmasvin, chipGongcha, chipHaidilao, chipMore)
         val brandNames = arrayOf("전체", "아마스빈", "공차", "하이디라오", "더보기")
         for (i in brandChips.indices) {
@@ -153,7 +144,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 맛 필터: 여러 개 선택, 누를 때마다 목록 다시 그리기
         val tasteChips = arrayOf(chipSweet, chipSour, chipNutty, chipSpicy, chipChoco)
         for (i in tasteChips.indices) {
             tasteChips[i].setOnClickListener {
@@ -163,7 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 정렬 탭: 고른 쪽을 진하게, 그 순서로 목록 다시 그리기
         tabPopular.setOnClickListener {
             tabPopular.setTextColor(Color.parseColor("#222222"))
             tabRecent.setTextColor(Color.parseColor("#888888"))
@@ -177,52 +166,42 @@ class MainActivity : AppCompatActivity() {
             showHomeList()
         }
 
-        // 하단 메뉴: 화면 전환 연결
         navSearch.setOnClickListener {
-            val intent = Intent(applicationContext, SearchActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(applicationContext, SearchActivity::class.java))
         }
         navAdd.setOnClickListener {
-            val intent = Intent(applicationContext, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(applicationContext, RegisterActivity::class.java))
         }
         navSave.setOnClickListener {
-            val intent = Intent(applicationContext, SavedActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(applicationContext, SavedActivity::class.java))
         }
 
-        // [마이페이지 / 로그인 화면 분기 처리]
         navMy.setOnClickListener {
             val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
             val isLoggedIn = sharedPreferences.getBoolean("IS_LOGGED_IN", false)
 
             if (isLoggedIn) {
-                // 로그인된 상태라면 마이페이지(MyPageActivity)로 이동
-                val intent = Intent(this, MyPageActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, MyPageActivity::class.java))
             } else {
-                // 로그인되지 않은 상태라면 로그인 화면(LoginActivity)으로 이동
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, LoginActivity::class.java))
             }
         }
     }
 
-    // 화면이 다시 보일 때마다 목록 새로 그리기 (10장 생명주기)
-    // 예: 상세 화면에서 좋아요·저장을 바꾸고 돌아오면 바로 반영됨
+    // [변경] 홈 화면 진입·복귀 시 Firestore에서 최신 레시피와 내 북마크/좋아요 동기화 후 화면 그리기
     override fun onResume() {
         super.onResume()
         showHomeList()
+        syncFirestoreData {
+            showHomeList()
+        }
     }
 
-    // 레시피가 지금 고른 필터에 맞는지 검사
     fun isMatch(recipe: Recipe): Boolean {
-        // 1. 브랜드: "전체"가 아니면 같은 브랜드만 통과
         if (selectedBrand != "전체" && recipe.brand != selectedBrand) {
             return false
         }
-        // 2. 맛: 하나도 안 골랐으면 통과, 골랐으면 그중 하나라도 비슷한 말이 있어야 통과
-        val text = recipe.tastes + " " + recipe.name   // 이름에 초콜릿이 든 음료도 잡기 위해 이름도 같이 검사
+        val text = recipe.tastes + " " + recipe.name
         var anySelected = false
         for (i in tasteNames.indices) {
             if (tasteSelected[i]) {
@@ -237,11 +216,9 @@ class MainActivity : AppCompatActivity() {
         return !anySelected
     }
 
-    // 홈 레시피 목록 그리기
     fun showHomeList() {
-        layoutHomeList.removeAllViews()   // 전에 붙인 카드 지우기
+        layoutHomeList.removeAllViews()
 
-        // 최신순 목록 만들기: 내가 등록한 레시피(최근 것부터) → 기본 레시피(뒤에 추가된 것부터)
         val showList = ArrayList<Recipe>()
         for (i in userRecipes.indices.reversed()) {
             if (isMatch(userRecipes[i])) showList.add(userRecipes[i])
@@ -250,7 +227,6 @@ class MainActivity : AppCompatActivity() {
             if (isMatch(recipeList[i])) showList.add(recipeList[i])
         }
 
-        // 인기순이면 좋아요 많은 순으로 다시 정렬
         if (sortType == "인기순") {
             showList.sortByDescending { it.likes }
         }
@@ -259,7 +235,6 @@ class MainActivity : AppCompatActivity() {
             addCard(recipe)
         }
 
-        // 보여줄 레시피가 없으면 안내 문구
         if (showList.size == 0) {
             txtHomeEmpty.visibility = View.VISIBLE
         } else {
@@ -267,7 +242,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 카드 XML(item_recipe_card.xml) 불러와서 내용 채우고 붙이기 (7장 View.inflate)
     fun addCard(recipe: Recipe) {
         val card = View.inflate(this, R.layout.item_recipe_card, null)
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -280,7 +254,7 @@ class MainActivity : AppCompatActivity() {
         card.findViewById<TextView>(R.id.txtCardTastes).text = recipe.tastes
         card.findViewById<TextView>(R.id.txtCardLikes).text = recipe.likes.toString()
 
-        // 북마크: 저장 상태에 맞게 보여주고, 누르면 보관함에 넣거나 빼기
+        // [변경] 북마크 토글 시 로컬 목록과 함께 Firestore users/{uid}에도 저장
         val imgCardSave = card.findViewById<ImageView>(R.id.imgCardSave)
         if (savedRecipes.contains(recipe)) {
             imgCardSave.setImageResource(R.drawable.ic_bookmark)
@@ -291,14 +265,15 @@ class MainActivity : AppCompatActivity() {
             if (savedRecipes.contains(recipe)) {
                 savedRecipes.remove(recipe)
                 imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
+                updateBookmarkInFirestore(recipe, false)
             } else {
                 savedRecipes.add(recipe)
                 imgCardSave.setImageResource(R.drawable.ic_bookmark)
+                updateBookmarkInFirestore(recipe, true)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // 카드 누르면 상세 화면으로 (10장 인텐트)
         card.setOnClickListener {
             val intent = Intent(applicationContext, DetailActivity::class.java)
             val baseIndex = recipeList.indexOf(recipe)
@@ -315,12 +290,10 @@ class MainActivity : AppCompatActivity() {
         layoutHomeList.addView(card)
     }
 
-    // dp → 픽셀
     fun dp(value: Int): Int {
         return (value * resources.displayMetrics.density).toInt()
     }
 
-    // 칩(필터 버튼)의 선택/해제 모양을 바꿔주는 함수
     fun setChipSelected(chip : TextView, selected : Boolean) {
         if (selected) {
             chip.setBackgroundResource(R.drawable.bg_chip_selected)

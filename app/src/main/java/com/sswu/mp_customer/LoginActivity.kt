@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class LoginActivity : AppCompatActivity() {
 
     private var isPasswordVisible = false // 비밀번호 표시 상태 관리
+
     // [추가] Firebase 인증 객체와 Firestore DB 객체를 담을 변수 선언
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -76,11 +77,13 @@ class LoginActivity : AppCompatActivity() {
             isPasswordVisible = !isPasswordVisible
             if (isPasswordVisible) {
                 // 비밀번호 보이게
-                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                etPassword.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 btnTogglePassword.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             } else {
                 // 비밀번호 숨기기 (* 처리)
-                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                etPassword.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 btnTogglePassword.setImageResource(android.R.drawable.ic_menu_view)
             }
             // 커서를 맨 뒤로 이동
@@ -113,7 +116,11 @@ class LoginActivity : AppCompatActivity() {
                             .addOnSuccessListener { document ->
                                 val firestoreNickname = document.getString("nickname")
                                 // [변경] 조회한 닉네임을 로컬 저장소에 반영하고 메인 화면으로 이동 (로그인 유지 체크 여부 함께 전달)
-                                completeLoginAndMove(email, firestoreNickname, cbKeepLogin.isChecked)
+                                completeLoginAndMove(
+                                    email,
+                                    firestoreNickname,
+                                    cbKeepLogin.isChecked
+                                )
                             }
                             .addOnFailureListener {
                                 // [추가] DB 조회에 일시 실패하더라도 로그인 자체는 정상 완료 처리
@@ -154,14 +161,18 @@ class LoginActivity : AppCompatActivity() {
     // [추가] 기존 로그인 성공 처리 로직(SharedPreferences 저장 + MainActivity 이동)을 별도 함수로 분리
     // Firestore에서 가져온 닉네임을 우선 적용하고, 없으면 기존 로컬 저장소 닉네임을 유지해 마이페이지와 호환됨
     // [변경] keepLogin: 로그인 유지 체크박스 상태를 SharedPreferences에 저장
-    private fun completeLoginAndMove(email: String, firestoreNickname: String?, keepLogin: Boolean) {
+    private fun completeLoginAndMove(
+        email: String,
+        firestoreNickname: String?,
+        keepLogin: Boolean
+    ) {
         val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
         val localSavedNickname = sharedPreferences.getString("NICKNAME_$email", null)
         val finalNickname = firestoreNickname ?: localSavedNickname
 
         sharedPreferences.edit {
             putBoolean("IS_LOGGED_IN", true)
-            putBoolean("KEEP_LOGIN", keepLogin) // [추가] 로그인 유지 여부 저장
+            putBoolean("KEEP_LOGIN", keepLogin)
             putString("USER_EMAIL", email)
             if (finalNickname != null) {
                 putString("NICKNAME", finalNickname)
@@ -169,10 +180,12 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
-
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        // [추가] 로그인한 계정의 Firestore 레시피 및 북마크/좋아요 불러오기
+        syncFirestoreData {
+            Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

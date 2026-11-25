@@ -17,13 +17,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-
 // 좋아요 누른 레시피 목록 (마이페이지 '좋아요한 조합'에서 사용)
 val likedRecipes = ArrayList<Recipe>()
 
 class DetailActivity : AppCompatActivity() {
-    class DetailActivity : AppCompatActivity() {
-    }
     // ===== 1. 위젯 변수 선언 =====
     lateinit var imgBack : ImageView
     lateinit var imgMore : ImageView
@@ -47,12 +44,12 @@ class DetailActivity : AppCompatActivity() {
     lateinit var btnBrandSite : TextView
 
     // ===== 상태 변수 =====
-    lateinit var recipe : Recipe   // 지금 보여주는 레시피
-    var serving = 1                // 선택한 인분 (1, 2, 3)
+    lateinit var recipe : Recipe
+    var serving = 1
     var liked = false
     var saved = false
     var followed = false
-    var followCount = 0            // 따라한 사람 수
+    var followCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,49 +62,46 @@ class DetailActivity : AppCompatActivity() {
         }
 
         // ===== 2. 위젯 대입 =====
-        imgBack = findViewById<ImageView>(R.id.imgBack)
-        imgMore = findViewById<ImageView>(R.id.imgMore)
-        txtName = findViewById<TextView>(R.id.txtName)
-        txtBrand = findViewById<TextView>(R.id.txtBrand)
-        txtTastes = findViewById<TextView>(R.id.txtTastes)
-        txtInfo = findViewById<TextView>(R.id.txtInfo)
-        btnServing1 = findViewById<TextView>(R.id.btnServing1)
-        btnServing2 = findViewById<TextView>(R.id.btnServing2)
-        btnServing3 = findViewById<TextView>(R.id.btnServing3)
-        layoutIngredients = findViewById<LinearLayout>(R.id.layoutIngredients)
-        layoutRatioBar = findViewById<LinearLayout>(R.id.layoutRatioBar)
-        txtRatio = findViewById<TextView>(R.id.txtRatio)
-        txtTip = findViewById<TextView>(R.id.txtTip)
-        btnLike = findViewById<LinearLayout>(R.id.btnLike)
-        imgLike = findViewById<ImageView>(R.id.imgLike)
-        txtLike = findViewById<TextView>(R.id.txtLike)
-        btnSave = findViewById<LinearLayout>(R.id.btnSave)
-        imgSave = findViewById<ImageView>(R.id.imgSave)
-        btnFollow = findViewById<TextView>(R.id.btnFollow)
-        btnBrandSite = findViewById<TextView>(R.id.btnBrandSite)
+        imgBack = findViewById(R.id.imgBack)
+        imgMore = findViewById(R.id.imgMore)
+        txtName = findViewById(R.id.txtName)
+        txtBrand = findViewById(R.id.txtBrand)
+        txtTastes = findViewById(R.id.txtTastes)
+        txtInfo = findViewById(R.id.txtInfo)
+        btnServing1 = findViewById(R.id.btnServing1)
+        btnServing2 = findViewById(R.id.btnServing2)
+        btnServing3 = findViewById(R.id.btnServing3)
+        layoutIngredients = findViewById(R.id.layoutIngredients)
+        layoutRatioBar = findViewById(R.id.layoutRatioBar)
+        txtRatio = findViewById(R.id.txtRatio)
+        txtTip = findViewById(R.id.txtTip)
+        btnLike = findViewById(R.id.btnLike)
+        imgLike = findViewById(R.id.imgLike)
+        txtLike = findViewById(R.id.txtLike)
+        btnSave = findViewById(R.id.btnSave)
+        imgSave = findViewById(R.id.imgSave)
+        btnFollow = findViewById(R.id.btnFollow)
+        btnBrandSite = findViewById(R.id.btnBrandSite)
 
-        // ===== 3. 홈 화면이 보낸 인텐트에서 레시피 번호 꺼내기 (10장 명시적 인텐트) =====
+        // ===== 3. 홈 화면이 보낸 인텐트에서 레시피 꺼내기 =====
         val index = intent.getIntExtra("index", 0)
-        val isUser = intent.getBooleanExtra("isUser", false)   // 사용자가 등록한 레시피인지
-        if (isUser) {
-            recipe = userRecipes[index]     // 등록 화면에서 만든 레시피
+        val isUser = intent.getBooleanExtra("isUser", false)
+        recipe = if (isUser) {
+            userRecipes[index]
         } else {
-            recipe = recipeList[index]      // 기본 레시피 (RecipeData.kt)
+            recipeList[index]
         }
 
-        // 이미 저장한 레시피면 북마크를 채워서 보여주기
         saved = savedRecipes.contains(recipe)
         if (saved) {
             imgSave.setImageResource(R.drawable.ic_bookmark)
         }
 
-        // 이미 좋아요한 레시피면 하트를 채워서 보여주기
         liked = likedRecipes.contains(recipe)
         if (liked) {
             imgLike.setImageResource(R.drawable.ic_favorite)
         }
 
-        // 화면에 레시피 내용 채우기
         setRecipeImage(findViewById(R.id.imgRecipe), recipe)
         txtName.text = recipe.name
         txtBrand.text = recipe.brand
@@ -119,26 +113,17 @@ class DetailActivity : AppCompatActivity() {
         drawRatioBar()
 
         // ===== 4. 클릭 동작 =====
+        imgBack.setOnClickListener { finish() }
 
-        // 뒤로가기: 현재 액티비티 끝내기 → 홈 화면으로 돌아감 (10장)
-        imgBack.setOnClickListener {
-            finish()
-        }
-
-        // 브랜드 공식 홈페이지 보기: 브랜드 이름을 넘기고 웹 화면 열기
         btnBrandSite.setOnClickListener {
             val intent = Intent(applicationContext, WebActivity::class.java)
             intent.putExtra("brand", recipe.brand)
             startActivity(intent)
         }
 
-        // 더보기(⋮): 컨텍스트 메뉴 열기 (7장)
         registerForContextMenu(imgMore)
-        imgMore.setOnClickListener {
-            openContextMenu(imgMore)
-        }
+        imgMore.setOnClickListener { openContextMenu(imgMore) }
 
-        // 인분 버튼: 누른 버튼만 선택 표시하고 재료 양 다시 계산
         val servingButtons = arrayOf(btnServing1, btnServing2, btnServing3)
         for (i in servingButtons.indices) {
             servingButtons[i].setOnClickListener {
@@ -153,7 +138,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        // 좋아요: 좋아요 목록(likedRecipes)에 넣거나 빼기
+        // [변경] 좋아요 토글 시 Firestore users/{uid} 및 recipes/{id}에 반영
         btnLike.setOnClickListener {
             if (liked) {
                 recipe.likes = recipe.likes - 1
@@ -166,23 +151,24 @@ class DetailActivity : AppCompatActivity() {
             }
             liked = !liked
             txtLike.text = "좋아요 " + recipe.likes
+            updateLikeInFirestore(recipe, liked)
         }
 
-        // 저장
-        // 저장: 보관함 목록(savedRecipes)에 넣거나 빼기
+        // [변경] 저장(북마크) 토글 시 Firestore users/{uid}에 반영
         btnSave.setOnClickListener {
             saved = !saved
             if (saved) {
                 savedRecipes.add(recipe)
                 imgSave.setImageResource(R.drawable.ic_bookmark)
+                updateBookmarkInFirestore(recipe, true)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
             } else {
                 savedRecipes.remove(recipe)
                 imgSave.setImageResource(R.drawable.ic_bookmark_border)
+                updateBookmarkInFirestore(recipe, false)
             }
         }
 
-        // 따라해봤어요: 누르면 따라한 사람 +1, 다시 누르면 취소
         btnFollow.setOnClickListener {
             if (followed) {
                 followCount = followCount - 1
@@ -199,17 +185,14 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    // 작성자 · 따라한 사람 수 표시
     fun showInfo() {
         txtInfo.text = recipe.author + " · 따라한 사람 " + followCount + "명"
     }
 
-    // 재료 목록을 Kotlin 코드로 만들어서 붙이기 (5장: Kotlin 코드로 화면 만들기)
     fun showIngredients() {
-        layoutIngredients.removeAllViews()   // 이전에 붙였던 줄 지우기
+        layoutIngredients.removeAllViews()
 
         for (i in recipe.ingredients.indices) {
-            // 한 줄 = 가로 리니어레이아웃 [재료 이름 ......... 양+단위]
             val row = LinearLayout(this)
             row.orientation = LinearLayout.HORIZONTAL
             row.setPadding(0, dp(6), 0, dp(6))
@@ -221,7 +204,7 @@ class DetailActivity : AppCompatActivity() {
             txtItem.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
 
             val txtAmount = TextView(this)
-            txtAmount.text = formatAmount(recipe.amounts[i] * serving) + recipe.unit   // 1인분 양 × 인분
+            txtAmount.text = formatAmount(recipe.amounts[i] * serving) + recipe.unit
             txtAmount.textSize = 16f
             txtAmount.setTypeface(null, Typeface.BOLD)
             txtAmount.setTextColor(Color.parseColor("#222222"))
@@ -232,7 +215,6 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    // 비율 막대그래프 + % 글자 만들기
     fun drawRatioBar() {
         val bar = RatioBarView(this)
         bar.amounts = recipe.amounts
@@ -252,21 +234,18 @@ class DetailActivity : AppCompatActivity() {
         txtRatio.text = text
     }
 
-    // 2.0 → "2", 0.5 → "0.5" 처럼 보기 좋게 바꾸기
     fun formatAmount(d: Double): String {
-        if (d % 1.0 == 0.0) {
-            return d.toInt().toString()
+        return if (d % 1.0 == 0.0) {
+            d.toInt().toString()
         } else {
-            return d.toString()
+            d.toString()
         }
     }
 
-    // dp 단위를 픽셀로 바꾸기 (코드로 크기를 정할 때는 픽셀 단위라서)
     fun dp(value: Int): Int {
         return (value * resources.displayMetrics.density).toInt()
     }
 
-    // ===== 컨텍스트 메뉴 (7장) =====
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
         menuInflater.inflate(R.menu.menu_detail, menu)
@@ -286,7 +265,6 @@ class DetailActivity : AppCompatActivity() {
         return super.onContextItemSelected(item)
     }
 
-    // 공유하기: 카톡, 메시지 등 다른 앱으로 레시피 보내기 (10장 암시적 인텐트)
     fun shareRecipe() {
         var text = "[Custom'er 꿀조합]\n" + recipe.name + " (" + recipe.brand + ")\n"
         for (i in recipe.ingredients.indices) {
@@ -300,12 +278,11 @@ class DetailActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, "레시피 공유하기"))
     }
 
-    // 신고하기: 확인 대화상자 (7장 대화상자)
     fun showReportDialog() {
         val dlg = AlertDialog.Builder(this@DetailActivity)
         dlg.setTitle("레시피 신고")
         dlg.setMessage("이 레시피를 신고할까요?")
-        dlg.setPositiveButton("신고") { dialog, which ->
+        dlg.setPositiveButton("신고") { _, _ ->
             Toast.makeText(applicationContext, "신고가 접수되었어요", Toast.LENGTH_SHORT).show()
         }
         dlg.setNegativeButton("취소", null)

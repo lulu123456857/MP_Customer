@@ -1,6 +1,11 @@
 package com.sswu.mp_customer
 
-// 레시피 한 개를 담는 클래스 (3장 클래스와 인스턴스)
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+
+// 레시피 한 개를 담는 클래스
 class Recipe(
     val name: String,               // 조합 이름
     val brand: String,              // 브랜드
@@ -10,8 +15,132 @@ class Recipe(
     val amounts: DoubleArray,       // 1인분 기준 양 (재료 순서와 같게)
     val unit: String,               // 단위 (한 레시피 안에서는 하나로 통일)
     val tip: String,                // 만드는 방법·팁
-    var likes: Int                  // 좋아요 수
+    var likes: Int,                 // 좋아요 수
+    var id: String = "",            // [추가] Firestore 문서 ID (기본 레시피는 "base_0", "base_1"...)
+    var authorUid: String = ""      // [추가] 작성자 Firebase UID
 )
+
+// [추가] 레시피 고유 ID 반환 (기본 레시피는 인덱스 기반, 사용자 등록 레시피는 Firestore 문서 ID)
+fun getRecipeId(recipe: Recipe): String {
+    if (recipe.id.isNotEmpty()) return recipe.id
+    val baseIdx = recipeList.indexOf(recipe)
+    if (baseIdx >= 0) {
+        recipe.id = "base_$baseIdx"
+        return recipe.id
+    }
+    return ""
+}
+
+// [추가] ID로 전체 레시피(기본 + 사용자 등록) 중에서 일치하는 Recipe 찾기
+fun findRecipeById(id: String): Recipe? {
+    if (id.startsWith("base_")) {
+        val idx = id.removePrefix("base_").toIntOrNull()
+        if (idx != null && idx in recipeList.indices) {
+            recipeList[idx].id = id
+            return recipeList[idx]
+        }
+    }
+    return userRecipes.find { it.id == id }
+}
+
+// [추가] 앱 시작 시 Firestore 'recipes' 컬렉션 불러오기 + 로그인 상태면 내 북마크/좋아요 불러오기
+fun syncFirestoreData(onComplete: () -> Unit = {}) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("recipes")
+        .orderBy("createdAt")
+        .get()
+        .addOnSuccessListener { result ->
+            userRecipes.clear()
+            for (doc in result) {
+                val ingList = (doc.get("ingredients") as? List<*>)?.map { it.toString() } ?: emptyList()
+                val amtList = (doc.get("amounts") as? List<*>)?.mapNotNull { (it as? Number)?.toDouble() } ?: emptyList()
+
+                if (ingList.size == amtList.size && ingList.isNotEmpty()) {
+                    val recipe = Recipe(
+                        name = doc.getString("name") ?: "",
+                        brand = doc.getString("brand") ?: "",
+                        tastes = doc.getString("tastes") ?: "",
+                        author = doc.getString("author") ?: "익명",
+                        ingredients = ingList.toTypedArray(),
+                        amounts = amtList.toDoubleArray(),
+                        unit = doc.getString("unit") ?: "스푼",
+                        tip = doc.getString("tip") ?: "",
+                        likes = (doc.getLong("likes") ?: 0L).toInt(),
+                        id = doc.id,
+                        authorUid = doc.getString("uid") ?: ""
+                    )
+                    userRecipes.add(recipe)
+                }
+            }
+            loadUserBookmarksAndLikes(onComplete)
+        }
+        .addOnFailureListener {
+            loadUserBookmarksAndLikes(onComplete)
+        }
+}
+
+// [추가] 현재 로그인된 사용자의 Firestore users/{uid}에서 savedRecipes, likedRecipes 복원
+fun loadUserBookmarksAndLikes(onComplete: () -> Unit = {}) {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    if (uid == null) {
+        onComplete()
+        return
+    }
+    FirebaseFirestore.getInstance().collection("users").document(uid).get()
+        .addOnSuccessListener { doc ->
+            val savedIds = (doc.get("savedRecipes") as? List<*>)?.map { it.toString() } ?: emptyList()
+            val likedIds = (doc.get("likedRecipes") as? List<*>)?.map { it.toString() } ?: emptyList()
+
+            savedRecipes.clear()
+            for (id in savedIds) {
+                findRecipeById(id)?.let { savedRecipes.add(it) }
+            }
+
+            likedRecipes.clear()
+            for (id in likedIds) {
+                findRecipeById(id)?.let { likedRecipes.add(it) }
+            }
+            onComplete()
+        }
+        .addOnFailureListener {
+            onComplete()
+        }
+}
+
+// [추가] 북마크(보관함) 토글 결과를 Firestore users/{uid}에 즉시 저장
+fun updateBookmarkInFirestore(recipe: Recipe, isSaved: Boolean) {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val id = getRecipeId(recipe)
+    if (id.isEmpty()) return
+
+    val userRef = FirebaseFirestore.getInstance().collection("users").document(uid)
+    val updateOp = if (isSaved) FieldValue.arrayUnion(id) else FieldValue.arrayRemove(id)
+    userRef.set(mapOf("savedRecipes" to updateOp), SetOptions.merge())
+}
+
+// [추가] 보관함 전체 삭제 시 Firestore users/{uid}의 savedRecipes 비우기
+fun clearBookmarksInFirestore() {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    FirebaseFirestore.getInstance().collection("users").document(uid)
+        .set(mapOf("savedRecipes" to emptyList<String>()), SetOptions.merge())
+}
+
+// [추가] 좋아요 토글 결과를 Firestore users/{uid} 및 recipes/{id}에 반영
+fun updateLikeInFirestore(recipe: Recipe, isLiked: Boolean) {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val id = getRecipeId(recipe)
+    if (id.isEmpty()) return
+
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("users").document(uid)
+    val updateOp = if (isLiked) FieldValue.arrayUnion(id) else FieldValue.arrayRemove(id)
+    userRef.set(mapOf("likedRecipes" to updateOp), SetOptions.merge())
+
+    // 사용자 등록 레시피라면 recipes 문서의 전체 좋아요 수도 동기화
+    if (!id.startsWith("base_")) {
+        db.collection("recipes").document(id).update("likes", recipe.likes)
+    }
+}
 
 // 앱에서 사용할 레시피 목록
 // recipeList[0] = 첫 번째 레시피, recipeList[1] = 두 번째 레시피 ...
