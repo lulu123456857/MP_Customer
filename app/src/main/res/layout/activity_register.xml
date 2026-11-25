@@ -59,6 +59,7 @@
             <!-- ===== 사진 추가 ===== -->
             <LinearLayout
                 android:id="@+id/boxPhoto"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_photo_box"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MP_Customer</string>
+    <string name="app_name">Custom\'er</string>
     <string name="login_title">이메일</string>
     <string name="email_hint">이메일을 입력해주세요</string>
     <string name="password_title">비밀번호</string>

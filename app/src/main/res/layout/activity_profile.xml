@@ -87,9 +87,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvProfileCountPost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2"
+                    android:text="0"
                     android:textColor="#7A5200"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -117,9 +118,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvProfileCountLike"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="574"
+                    android:text="0"
                     android:textColor="#7A5200"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -147,9 +149,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvProfileCountSave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3"
+                    android:text="0"
                     android:textColor="#7A5200"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -240,6 +243,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tvTaste1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_chip_selected"
@@ -250,6 +254,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/tvTaste2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -261,6 +266,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/tvTaste3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -282,7 +288,7 @@
             android:layout_marginBottom="20dp"
             android:background="@drawable/bg_card_round"
             android:padding="16dp"
-            android:text="내가 올린 조합 2개 보기   >"
+            android:text="내가 올린 조합 보기   >"
             android:textColor="#222222"
             android:textSize="14sp" />
 

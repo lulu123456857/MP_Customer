@@ -199,8 +199,12 @@ class SearchActivity : AppCompatActivity() {
         // 북마크: 저장 상태에 맞게 보여주고, 누르면 보관함에 넣거나 빼기
         val imgCardSave = card.findViewById<ImageView>(R.id.imgCardSave)
         if (savedRecipes.contains(recipe)) {
+            savedRecipes.remove(recipe)
+            updateBookmarkInFirestore(recipe, false)
             imgCardSave.setImageResource(R.drawable.ic_bookmark)
         } else {
+            savedRecipes.add(recipe)
+            updateBookmarkInFirestore(recipe, true)
             imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
         }
         imgCardSave.setOnClickListener {

@@ -123,8 +123,30 @@ class MainActivity : AppCompatActivity() {
         imgBell.setOnClickListener {
             Toast.makeText(applicationContext, "새 알림이 없어요", Toast.LENGTH_SHORT).show()
         }
+        // 랜덤 추천: 전체 레시피 중 하나를 무작위로 골라 상세 화면으로
         bannerRandom.setOnClickListener {
-            Toast.makeText(applicationContext, "랜덤 추천은 준비 중이에요", Toast.LENGTH_SHORT).show()
+            val allRecipes = ArrayList<Recipe>()
+            for (r in recipeList) allRecipes.add(r)
+            for (r in userRecipes) allRecipes.add(r)
+
+            if (allRecipes.size == 0) {
+                Toast.makeText(applicationContext, "추천할 레시피가 없어요", Toast.LENGTH_SHORT).show()
+            } else {
+                // 0 이상 1 미만의 난수 × 레시피 수 → 0 ~ (개수-1) 중 하나
+                val pick = allRecipes[(Math.random() * allRecipes.size).toInt()]
+                Toast.makeText(applicationContext, "오늘의 꿀조합: " + pick.name, Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(applicationContext, DetailActivity::class.java)
+                val baseIndex = recipeList.indexOf(pick)
+                if (baseIndex >= 0) {
+                    intent.putExtra("index", baseIndex)
+                    intent.putExtra("isUser", false)
+                } else {
+                    intent.putExtra("index", userRecipes.indexOf(pick))
+                    intent.putExtra("isUser", true)
+                }
+                startActivity(intent)
+            }
         }
 
         val brandChips = arrayOf(chipAll, chipAmasvin, chipGongcha, chipHaidilao, chipMore)

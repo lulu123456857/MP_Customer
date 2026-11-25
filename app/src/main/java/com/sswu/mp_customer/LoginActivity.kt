@@ -10,6 +10,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.edit
@@ -139,9 +140,29 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // 5. 비밀번호 찾기
         btnFindPassword.setOnClickListener {
-            Toast.makeText(this, "비밀번호 찾기 화면 (준비 중)", Toast.LENGTH_SHORT).show()
+            val email = etEmail.text.toString().trim()
+            if (email.isEmpty()) {
+                Toast.makeText(this, "이메일 칸에 가입한 이메일을 먼저 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else {
+                // 확인 대화상자 (7장)
+                val dlg = AlertDialog.Builder(this@LoginActivity)
+                dlg.setTitle("비밀번호 찾기")
+                dlg.setMessage(email + "\n이 주소로 비밀번호 재설정 메일을 보낼까요?")
+                dlg.setPositiveButton("보내기") { dialog, which ->
+                    // Firebase가 비밀번호 재설정 링크를 메일로 보내줌
+                    auth.sendPasswordResetEmail(email)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "메일을 보냈어요. 메일함을 확인해주세요!", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(this, "메일을 보내지 못했어요. 이메일을 확인해주세요", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
+                dlg.setNegativeButton("취소", null)
+                dlg.show()
+            }
         }
 
         // 6. 회원가입 버튼 → 회원가입 화면으로 이동
