@@ -280,7 +280,9 @@ class MainActivity : AppCompatActivity() {
             imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
         }
         imgCardSave.setOnClickListener {
-            if (savedRecipes.contains(recipe)) {
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
+            } else if (savedRecipes.contains(recipe)) {
                 savedRecipes.remove(recipe)
                 imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
                 updateBookmarkInFirestore(recipe, false)

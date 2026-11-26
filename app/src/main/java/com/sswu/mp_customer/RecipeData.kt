@@ -418,3 +418,6 @@ val recipeList = arrayOf(
         0
     )
 )
+fun isLoggedIn(): Boolean {
+    return FirebaseAuth.getInstance().currentUser != null
+}

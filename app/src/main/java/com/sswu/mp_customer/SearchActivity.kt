@@ -199,21 +199,21 @@ class SearchActivity : AppCompatActivity() {
         // 북마크: 저장 상태에 맞게 보여주고, 누르면 보관함에 넣거나 빼기
         val imgCardSave = card.findViewById<ImageView>(R.id.imgCardSave)
         if (savedRecipes.contains(recipe)) {
-            savedRecipes.remove(recipe)
-            updateBookmarkInFirestore(recipe, false)
             imgCardSave.setImageResource(R.drawable.ic_bookmark)
         } else {
-            savedRecipes.add(recipe)
-            updateBookmarkInFirestore(recipe, true)
             imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
         }
         imgCardSave.setOnClickListener {
-            if (savedRecipes.contains(recipe)) {
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
+            } else if (savedRecipes.contains(recipe)) {
                 savedRecipes.remove(recipe)
                 imgCardSave.setImageResource(R.drawable.ic_bookmark_border)
+                updateBookmarkInFirestore(recipe, false)
             } else {
                 savedRecipes.add(recipe)
                 imgCardSave.setImageResource(R.drawable.ic_bookmark)
+                updateBookmarkInFirestore(recipe, true)
                 Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
             }
         }
