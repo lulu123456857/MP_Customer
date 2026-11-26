@@ -4,7 +4,7 @@ import android.widget.ImageView
 
 // 레시피의 브랜드를 보고, 이미지 칸에 알맞은 이미지를 넣는 함수
 fun setRecipeImage(img: ImageView, recipe: Recipe) {
-    var image = R.drawable.recipe_drink    // 기본: 음료 이미지
+    var image = R.drawable.recipe_etc    // 기본(기타 브랜드): 기타 이미지
 
     when (recipe.brand) {
         "공차", "아마스빈" -> image = R.drawable.recipe_drink
