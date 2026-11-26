@@ -43,7 +43,7 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var btnRegister : TextView
 
     // ===== 상태 변수 =====
-    val brands = arrayOf("아마스빈", "공차", "하이디라오", "서브웨이", "기타")
+    val brands = arrayOf("아마스빈", "공차", "하이디라오", "기타")
     val units = arrayOf("스푼", "샷", "ml", "g", "개", "%")
     var selectedBrand = ""
     var selectedUnit = "스푼"
