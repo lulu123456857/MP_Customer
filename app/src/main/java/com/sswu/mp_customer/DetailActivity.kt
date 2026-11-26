@@ -138,50 +138,60 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        // [변경] 좋아요 토글 시 Firestore users/{uid} 및 recipes/{id}에 반영
         btnLike.setOnClickListener {
-            if (liked) {
-                recipe.likes = recipe.likes - 1
-                likedRecipes.remove(recipe)
-                imgLike.setImageResource(R.drawable.ic_favorite_border)
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
             } else {
-                recipe.likes = recipe.likes + 1
-                likedRecipes.add(recipe)
-                imgLike.setImageResource(R.drawable.ic_favorite)
+                if (liked) {
+                    recipe.likes = recipe.likes - 1
+                    likedRecipes.remove(recipe)
+                    imgLike.setImageResource(R.drawable.ic_favorite_border)
+                } else {
+                    recipe.likes = recipe.likes + 1
+                    likedRecipes.add(recipe)
+                    imgLike.setImageResource(R.drawable.ic_favorite)
+                }
+                liked = !liked
+                txtLike.text = "좋아요 " + recipe.likes
+                updateLikeInFirestore(recipe, liked)
             }
-            liked = !liked
-            txtLike.text = "좋아요 " + recipe.likes
-            updateLikeInFirestore(recipe, liked)
         }
 
-        // [변경] 저장(북마크) 토글 시 Firestore users/{uid}에 반영
         btnSave.setOnClickListener {
-            saved = !saved
-            if (saved) {
-                savedRecipes.add(recipe)
-                imgSave.setImageResource(R.drawable.ic_bookmark)
-                updateBookmarkInFirestore(recipe, true)
-                Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
             } else {
-                savedRecipes.remove(recipe)
-                imgSave.setImageResource(R.drawable.ic_bookmark_border)
-                updateBookmarkInFirestore(recipe, false)
+                saved = !saved
+                if (saved) {
+                    savedRecipes.add(recipe)
+                    imgSave.setImageResource(R.drawable.ic_bookmark)
+                    updateBookmarkInFirestore(recipe, true)
+                    Toast.makeText(applicationContext, "보관함에 저장했어요", Toast.LENGTH_SHORT).show()
+                } else {
+                    savedRecipes.remove(recipe)
+                    imgSave.setImageResource(R.drawable.ic_bookmark_border)
+                    updateBookmarkInFirestore(recipe, false)
+                }
             }
         }
 
         btnFollow.setOnClickListener {
-            if (followed) {
-                followCount = followCount - 1
-                btnFollow.text = "✓ 따라해봤어요"
-                btnFollow.setBackgroundResource(R.drawable.bg_follow_button)
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
             } else {
-                followCount = followCount + 1
-                btnFollow.text = "따라해봤어요! (취소)"
-                btnFollow.setBackgroundResource(R.drawable.bg_chip_selected)
-                Toast.makeText(applicationContext, "맛있게 드세요!", Toast.LENGTH_SHORT).show()
+                if (followed) {
+                    followCount = followCount - 1
+                    btnFollow.text = "✓ 따라해봤어요"
+                    btnFollow.setBackgroundResource(R.drawable.bg_follow_button)
+                } else {
+                    followCount = followCount + 1
+                    btnFollow.text = "따라해봤어요! (취소)"
+                    btnFollow.setBackgroundResource(R.drawable.bg_chip_selected)
+                    Toast.makeText(applicationContext, "맛있게 드세요!", Toast.LENGTH_SHORT).show()
+                }
+                followed = !followed
+                showInfo()
             }
-            followed = !followed
-            showInfo()
         }
     }
 

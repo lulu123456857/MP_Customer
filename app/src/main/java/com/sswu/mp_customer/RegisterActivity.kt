@@ -135,8 +135,13 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        btnRegister.setOnClickListener { checkAndRegister() }
-    }
+        btnRegister.setOnClickListener {
+            if (!isLoggedIn()) {
+                Toast.makeText(applicationContext, "로그인 후 사용 가능합니다", Toast.LENGTH_SHORT).show()
+            } else {
+                checkAndRegister()
+            }
+        }}
 
     fun addIngredientRow() {
         val row = LinearLayout(this)
