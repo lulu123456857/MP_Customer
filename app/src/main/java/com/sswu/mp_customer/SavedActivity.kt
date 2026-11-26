@@ -26,6 +26,7 @@ class SavedActivity : AppCompatActivity() {
     lateinit var chipGongcha : TextView
     lateinit var chipAmasvin : TextView
     lateinit var chipHaidilao : TextView
+    lateinit var chipEtc : TextView
     lateinit var layoutSavedList : LinearLayout
     lateinit var txtEmpty : TextView
 
@@ -48,6 +49,7 @@ class SavedActivity : AppCompatActivity() {
         chipGongcha = findViewById(R.id.chipGongcha)
         chipAmasvin = findViewById(R.id.chipAmasvin)
         chipHaidilao = findViewById(R.id.chipHaidilao)
+        chipEtc = findViewById<TextView>(R.id.chipEtc)
         layoutSavedList = findViewById(R.id.layoutSavedList)
         txtEmpty = findViewById(R.id.txtEmpty)
 
@@ -56,8 +58,8 @@ class SavedActivity : AppCompatActivity() {
         registerForContextMenu(imgMore)
         imgMore.setOnClickListener { openContextMenu(imgMore) }
 
-        val brandChips = arrayOf(chipAll, chipGongcha, chipAmasvin, chipHaidilao)
-        val brandNames = arrayOf("전체", "공차", "아마스빈", "하이디라오")
+        val brandChips = arrayOf(chipAll, chipGongcha, chipAmasvin, chipHaidilao, chipEtc)
+        val brandNames = arrayOf("전체", "공차", "아마스빈", "하이디라오", "기타")
         for (i in brandChips.indices) {
             brandChips[i].setOnClickListener {
                 filterBrand = brandNames[i]

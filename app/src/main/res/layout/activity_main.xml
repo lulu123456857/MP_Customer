@@ -174,7 +174,7 @@
                     android:paddingEnd="16dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:text="더보기"
+                    android:text="기타"
                     android:textColor="#555555"
                     android:textSize="14sp" />
                 </LinearLayout>

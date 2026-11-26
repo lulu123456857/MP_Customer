@@ -150,19 +150,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         val brandChips = arrayOf(chipAll, chipAmasvin, chipGongcha, chipHaidilao, chipMore)
-        val brandNames = arrayOf("전체", "아마스빈", "공차", "하이디라오", "더보기")
+        val brandNames = arrayOf("전체", "아마스빈", "공차", "하이디라오", "기타")
         for (i in brandChips.indices) {
             brandChips[i].setOnClickListener {
-                if (brandNames[i] == "더보기") {
-                    Toast.makeText(applicationContext, "다른 브랜드는 준비 중이에요", Toast.LENGTH_SHORT).show()
-                } else {
-                    for (c in brandChips) {
-                        setChipSelected(c, false)
-                    }
-                    setChipSelected(brandChips[i], true)
-                    selectedBrand = brandNames[i]
-                    showHomeList()
+                for (c in brandChips) {
+                    setChipSelected(c, false)
                 }
+                setChipSelected(brandChips[i], true)
+                selectedBrand = brandNames[i]
+                showHomeList()
             }
         }
 
